@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive CRM Build-Out Action Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices: 
+        - Report Info (Robert's/Greg's Action Items): Goal: Inform, Organize. Viz/Presentation: Expandable card showing action title, description, and "How to accomplish" steps. Interaction: Click to expand/collapse. Justification: Clearly presents task details on demand. Method: Structured HTML/CSS (Tailwind), JS for interactivity.
+        - Report Info (Project Next Steps): Goal: Inform. Viz/Presentation: List of items in expandable cards. Interaction: Click to expand/collapse. Justification: Concise overview of next phase actions. Method: HTML/CSS, JS.
+        - Derived Info (Task Distribution Chart): Goal: Inform, Compare. Viz/Presentation: Bar chart showing number of action items by main assignee/category. Interaction: Static display with tooltips. Justification: Provides a quick visual summary of workload distribution. Method: Chart.js (Canvas).
+        - Derived Info (Robert's Tasks by Module Chart): Goal: Inform, Compare. Viz/Presentation: Bar chart showing number of Robert's tasks per CRM module. Interaction: Static display with tooltips. Justification: Visualizes task concentration within Robert's responsibilities. Method: Chart.js (Canvas).
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .task-card-content { display: none; }
+        .task-card-content.expanded { display: block; }
+        .tab-button.active {
+            background-color: #D97706; /* amber-600 */
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Or Tailwind max-w-xl, max-w-2xl etc. */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height, adjust with Tailwind for responsive heights */
+            max-height: 400px; /* Max height */
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Ensure Inter font is loaded if not default */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 min-h-screen अंतर्ज्ञान">
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-amber-700">Zoho CRM Build-Out Action Plan</h1>
+            <p class="text-stone-600 mt-2">An interactive guide to your CRM implementation project.</p>
+        </header>
+
+        <nav class="mb-8">
+            <ul class="flex flex-wrap justify-center border-b border-stone-300">
+                <li class="-mb-px mr-1">
+                    <button class="tab-button bg-white inline-block py-2 px-4 text-amber-600 hover:text-amber-700 font-semibold rounded-t" data-tab="summary">Visual Summary</button>
+                </li>
+                <li class="-mb-px mr-1">
+                    <button class="tab-button bg-white inline-block py-2 px-4 text-amber-600 hover:text-amber-700 font-semibold rounded-t" data-tab="robert">Robert's Action Items</button>
+                </li>
+                <li class="-mb-px mr-1">
+                    <button class="tab-button bg-white inline-block py-2 px-4 text-amber-600 hover:text-amber-700 font-semibold rounded-t" data-tab="greg">Greg's Action Items</button>
+                </li>
+                <li class="mr-1">
+                    <button class="tab-button bg-white inline-block py-2 px-4 text-amber-600 hover:text-amber-700 font-semibold rounded-t" data-tab="nextsteps">Project Next Steps</button>
+                </li>
+            </ul>
+        </nav>
+
+        <main>
+            <div id="summary" class="tab-content p-2 sm:p-4 rounded-lg">
+                <h2 class="text-2xl font-semibold text-amber-700 mb-6">Project Visual Summary</h2>
+                <p class="text-stone-700 mb-6">This section provides a visual overview of the task distribution for the CRM build-out. These charts summarize the number of action items assigned and their breakdown by module for Robert's tasks.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-stone-700 mb-4 text-center">Action Items by Assignee/Category</h3>
+                        <div class="chart-container">
+                            <canvas id="taskDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-stone-700 mb-4 text-center">Robert's Tasks by CRM Module</h3>
+                        <div class="chart-container">
+                            <canvas id="robertTasksByModuleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="robert" class="tab-content p-2 sm:p-4 rounded-lg">
+                <h2 class="text-2xl font-semibold text-amber-700 mb-6">Robert (BH Technology) - Action Items</h2>
+                <p class="text-stone-700 mb-6">This section outlines the technical configuration and setup tasks within Zoho CRM assigned to Robert. Each item details the specific action and steps for implementation. Click on an item to expand and see the details.</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-amber-600 mb-3 ml-1">A. Contacts Module Enhancements</h3>
+                        <div class="space-y-4" id="robert-contacts">
+                            </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-amber-600 mb-3 ml-1">B. Accounts Module Build-Out</h3>
+                        <div class="space-y-4" id="robert-accounts">
+                            </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-amber-600 mb-3 ml-1">C. Tasks Module Optimization</h3>
+                        <div class="space-y-4" id="robert-tasks-module">
+                            </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-amber-600 mb-3 ml-1">D. Mapping and Territory Management</h3>
+                        <div class="space-y-4" id="robert-mapping">
+                            </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-amber-600 mb-3 ml-1">E. Zoho Platform Setup & Integration</h3>
+                        <div class="space-y-4" id="robert-platform">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="greg" class="tab-content p-2 sm:p-4 rounded-lg">
+                <h2 class="text-2xl font-semibold text-amber-700 mb-6">Greg ('marin') - Action Items</h2>
+                <p class="text-stone-700 mb-6">This section details the tasks assigned to Greg, which primarily involve providing necessary business data and actively participating in system reviews. Click on an item to expand and see the details.</p>
+                <div class="space-y-4" id="greg-tasks">
+                    </div>
+            </div>
+
+            <div id="nextsteps" class="tab-content p-2 sm:p-4 rounded-lg">
+                <h2 class="text-2xl font-semibold text-amber-700 mb-6">Project Next Steps</h2>
+                <p class="text-stone-700 mb-6">This section outlines the broader progression of the CRM build-out project, detailing the upcoming phases and their goals. Click on an item to expand and see the details.</p>
+                <div class="space-y-4" id="project-next-steps">
+                    </div>
+            </div>
+        </main>
+
+        <footer class="mt-12 pt-8 border-t border-stone-300 text-center text-stone-500">
+            <p>&copy; <span id="currentYear"></span> CRM Build-Out Project. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data from the Source Report
+        const reportData = {
+            robertActions: {
+                contacts: [
+                    {
+                        title: "A.1. Finalize 'Last Inquiry Date' field setup and logic.",
+                        description: "Ensure this custom field accurately timestamps the receipt of a new patient lead/referral from an account, distinct from general activity.",
+                        howTo: [
+                            "Navigate to `Setup` > `Customization` > `Modules and Fields`.",
+                            "Select the `Contacts` module.",
+                            "Locate the 'Last Inquiry Date' field (ensure it's a Date/Time field type).",
+                            "<strong>Configure Automation (Workflow Rule):</strong>",
+                            "- Go to `Setup` > `Automation` > `Workflow Rules`.",
+                            "- Create a new workflow rule for the `Contacts` module.",
+                            "- <strong>Trigger:</strong> When a new \"Patient Lead\" record (or equivalent custom module/field) is created or associated with a Contact. *This assumes a mechanism for tracking patient leads; if it's manual, the field update would be manual.*",
+                            "- <strong>Condition:</strong> Define conditions to ensure it only triggers for legitimate patient lead entries (e.g., if a specific field like \"Lead Status\" changes to \"New Patient Referral\").",
+                            "- <strong>Instant Action:</strong> 'Field Update'.",
+                            "- <strong>Field to Update:</strong> 'Last Inquiry Date'.",
+                            "- <strong>Value:</strong> `Current Date & Time` (or a specific field from the patient lead record if it exists).",
+                            "- <strong>Exclusions:</strong> Confirm that mass updates or automated system actions do *not* trigger this field update, as per discussion. This might involve refining the workflow trigger conditions."
+                        ]
+                    },
+                    {
+                        title: "A.2. Configure 'Last Activity' Field logic.",
+                        description: "Ensure the 'Last Activity' field updates only for genuine manual user interactions (calls, meetings, emails, tasks, manual field updates) and *excludes* mass updates, automated system actions, and API-driven updates.",
+                        howTo: [
+                            "Zoho CRM often has a built-in 'Last Activity Time' field. Review its default behavior.",
+                            "If a custom field is needed or the default needs modification:",
+                            "- <strong>Workflow Rules (for each trigger):</strong> Create separate workflow rules (or modify existing ones) for the `Contacts` module.",
+                            "- <strong>Triggers:</strong> On `Call` creation/logging; On `Meeting` creation/logging; On `Email` sending/receiving (if linked via Zoho Mail integration); On `Task` completion (when `Status` changes to 'Completed'); On *any* manual field update to the Contact record (this might require a broader workflow rule or a custom function if specific field updates are desired).",
+                            "- <strong>Instant Action:</strong> 'Field Update' for 'Last Activity' field to `Current Date & Time`.",
+                            "- <strong>Exclusions (Crucial):</strong>",
+                            "  - <strong>Mass Updates:</strong> Zoho workflow rules typically don't trigger on mass updates by default. Verify this behavior. If they do, custom functions might be needed to check if the update source is a mass update.",
+                            "  - <strong>Automated System Actions (Workflows/Schedules):</strong> Ensure workflows that update contact fields for other purposes do *not* trigger the 'Last Activity' update. This is usually managed by careful workflow design (e.g., setting specific criteria that exclude automated changes).",
+                            "  - <strong>API-Driven Updates:</strong> Similar to mass updates, API calls might bypass workflow triggers depending on how they are configured. This may require custom code (Deluge scripts) within Zoho to handle specific API update scenarios if direct control is needed."
+                        ]
+                    }
+                ],
+                accounts: [
+                    {
+                        title: "B.1. Build the preliminary Account Scoring system (A, B, C logic).",
+                        description: "Implement a system to classify accounts (A, B, C, No Score) based on patient referrals and admissions, evaluated quarterly.",
+                        howTo: [
+                            "<strong>Custom Fields:</strong> In the `Accounts` module, create custom fields: `Total Referrals` (Number), `Total Admits` (Number), `Conversion Percentage` (Formula/Number), `Account Score` (Picklist: A, B, C, No Score). Ensure `Inbound Referral Timestamp` and `Admission Date Timestamp` fields are available.",
+                            "<strong>Automation (Workflow Rules / Schedule Actions / Custom Functions):</strong>",
+                            "- Update `Total Referrals` and `Total Admits`: Create workflows/custom functions to increment these based on new patient leads and admissions.",
+                            "- Calculate `Conversion Percentage`: Create a formula field: `(Total Admits / Total Referrals) * 100`. Handle division by zero.",
+                            "- Automate `Account Score` (Scheduled Workflow / Custom Function): Trigger quarterly. Use `Decision` blocks for A, B, C, No Score conditions based on referrals, admits, conversion %, or monthly admits.",
+                            "- Consider Custom Functions (Deluge Script) for complex calculations like \"2 admits/month\" or dynamic quarterly evaluations."
+                        ]
+                    },
+                    {
+                        title: "B.2. Set up automation for 'Inactive' account status.",
+                        description: "Automatically mark accounts as 'Inactive' if no activity for 3 months, and notify the owner and their leader.",
+                        howTo: [
+                            "<strong>Custom Field:</strong> In `Accounts` module, ensure an `Account Status` picklist field exists (Active, Inactive).",
+                            "<strong>Workflow Rule (Scheduled):</strong> Trigger daily/weekly. Condition: `Last Activity Date` < `(Current Date - 90 days)` AND `Account Status` is `Active`.",
+                            "<strong>Instant Actions:</strong> Field Update `Account Status` to 'Inactive'; Email Notification to `Account Owner` and `Manager` (create template).",
+                            "<strong>Dashboard Component:</strong> Create a chart/table for `Accounts` with `Account Status` is `Inactive` AND `Last Modified Time` in the last `7 days`."
+                        ]
+                    },
+                    {
+                        title: "B.3. Add \"Business Development Representative from another treatment center\" to contact types.",
+                        description: "Expand the picklist values for Contact Types.",
+                        howTo: [
+                            "Navigate to `Setup` > `Customization` > `Modules and Fields`.",
+                            "Select the `Contacts` module.",
+                            "Click on the 'Contact Type' field. Click `Edit Properties`.",
+                            "Add the new value and save."
+                        ]
+                    },
+                    {
+                        title: "B.4. Add Kaiser to the list of insurance companies for Elevate.",
+                        description: "Update the picklist of insurance providers.",
+                        howTo: [
+                            "Navigate to `Setup` > `Customization` > `Modules and Fields`.",
+                            "Select `Accounts` module (or relevant module for insurance).",
+                            "Locate 'Insurance Provider' field. Click `Edit Properties`.",
+                            "Add \"Kaiser\" and save."
+                        ]
+                    },
+                    {
+                        title: "B.5. Configure Contract Statuses for EAPs/Unions.",
+                        description: "Track \"In Process,\" \"Approved/Won,\" and \"Lost\" for EAP/Union contracts.",
+                        howTo: [
+                            "<strong>Custom Field:</strong> In `Accounts` module (or `Contracts` module), create a picklist `Contract Status`.",
+                            "<strong>Picklist Values:</strong> Add \"In Process\", \"Approved/Won\", \"Lost\".",
+                            "Ensure field is on relevant layouts."
+                        ]
+                    }
+                ],
+                tasksModule: [
+                     {
+                        title: "C.1. Configure task completion to require specific mandatory fields.",
+                        description: "Prevent users from marking a task as 'Completed' unless 'Activity Type', 'Subject', and 'Date Completed' are filled.",
+                        howTo: [
+                            "<strong>Layout Rules:</strong> `Setup` > `Customization` > `Modules and Fields` > `Tasks` > `Layouts` > `Layout Rules`. Create rule: Trigger when `Status` is `Completed`. Action: Set `Activity Type`, `Subject`, `Date Completed` as `Mandatory`.",
+                            "(*Note: 'Date Completed' is often auto-timestamped; focus on user input for 'Activity Type' and 'Subject'*).",
+                            "<strong>Validation Rules (Alternative/Supplement):</strong> For stricter control, use `Setup` > `Customization` > `Validation Rules`."
+                        ]
+                    },
+                    {
+                        title: "C.2. Adjust task layout for improved usability.",
+                        description: "Reposition 'Subject' directly under 'Activity Type', and 'Close Time' (Date Completed) under 'Subject'.",
+                        howTo: [
+                            "Navigate to `Setup` > `Customization` > `Modules and Fields` > `Tasks` > `Layouts`.",
+                            "Drag and drop fields to desired positions: 'Subject' below 'Activity Type'; 'Close Time' below 'Subject'. Ensure 'Due Date' is visible.",
+                            "Save layout."
+                        ]
+                    },
+                    {
+                        title: "C.3. Set up user hierarchies and the \"follower\" system for Tasks module.",
+                        description: "Define roles (managers, team members) and enable managers to \"follow\" their team's tasks for visibility.",
+                        howTo: [
+                            "<strong>Roles and Profiles:</strong> `Setup` > `Users and Control` > `Security Control` > `Roles`. Create/modify roles (e.g., \"BD Manager\", \"BD Representative\") and define hierarchy. Adjust `Profiles` for data visibility (View All/Team's Data for managers, View My Data for reps).",
+                            "<strong>Data Sharing Settings:</strong> `Setup` > `Users and Control` > `Security Control` > `Data Sharing Settings`. Configure rules for managers to see subordinates' records.",
+                            "<strong>Follower Feature:</strong> Use built-in 'Follow'. For automatic following by managers, a custom function might be needed."
+                        ]
+                    },
+                    {
+                        title: "C.4. Ensure non-deletion policy for tasks.",
+                        description: "Users should not be able to delete tasks; tasks are either open or completed.",
+                        howTo: [
+                            "<strong>Profile Permissions:</strong> `Setup` > `Users and Control` > `Security Control` > `Profiles`. Edit BD Representative profiles. Under `Module Permissions` for `Tasks`, uncheck `Delete` permission. Save."
+                        ]
+                    }
+                ],
+                mapping: [
+                    {
+                        title: "D.1. Schedule a follow-up meeting with Greg and the mapping software team.",
+                        description: "Coordinate a joint session to demo the mapping tool's capabilities, discuss territory assignment (by counties), visualize account scores, and explore task creation integration.",
+                        howTo: [
+                            "Robert to communicate with mapping software vendor to arrange time.",
+                            "Robert to communicate with Greg for mutual availability.",
+                            "Ensure vendor demonstrates: Territory definition by counties, Route planning, Displaying accounts on map, Pulling/visualizing A,B,C scores, Linking to Zoho CRM record, Streamlining task creation from map."
+                        ]
+                    }
+                ],
+                platform: [
+                    {
+                        title: "E.1. Prepare Greg's team's live Zoho CRM instance.",
+                        description: "Replicate configurations from the development/staging environment to the live instance, including intensive email integration and campaign setup.",
+                        howTo: [
+                            "<strong>Configuration Migration:</strong> Use Zoho CRM's `Sandbox` (if available) or manually replicate settings.",
+                            "<strong>Email Integration (Intensive):</strong> `Setup` > `Channels` > `Email`. Configure Zoho Mail or external email (IMAP/POP3). Set up `Email Deliverability` (SPF, DKIM, DMARC - requires DNS changes). Ensure domain approvals. Create email templates.",
+                            "<strong>Campaign Setup:</strong> `Campaigns` module. Configure settings. If using Zoho Campaigns, establish integration."
+                        ]
+                    },
+                    {
+                        title: "E.2. Set up a temporary login for Greg in the main Zoho account (acting as a demo environment).",
+                        description: "Provide Greg with access to a configured environment populated with sample data for review and testing.",
+                        howTo: [
+                            "<strong>Create a New User:</strong> `Setup` > `Users and Control` > `Users`. Enter Greg's details, assign temporary password, appropriate Profile (e.g., \"BD Manager\" or custom \"Demo User\"), and Role.",
+                            "<strong>Populate Demo Data:</strong> Manually create/import sample `Accounts`, `Contacts`, `Leads`, `Tasks` reflecting typical scenarios (A,B,C accounts, activity, inactivity, tasks). Ensure data triggers scoring and tracking."
+                        ]
+                    }
+                ]
+            },
+            gregActions: [
+                {
+                    title: "1. Send Elevate's in-network and out-of-network insurance list to Robert.",
+                    description: "Provide a comprehensive list of all insurance providers Elevate works with, categorized by in-network and out-of-network status.",
+                    howTo: [
+                        "Compile the list from existing records (spreadsheets, internal documents).",
+                        "Clearly categorize each provider as \"in-network\" or \"out-of-network.\"",
+                        "Send the complete list to Robert via an agreed-upon method (e.g., email, shared document)."
+                    ]
+                },
+                {
+                    title: "2. Coordinate availability for the joint meeting with Robert and the mapping software team.",
+                    description: "Provide suitable dates and times for the upcoming meeting to discuss and demo the mapping tool.",
+                    howTo: [
+                        "Review your calendar and identify several potential dates and times that work for you.",
+                        "Communicate these availabilities to Robert promptly so he can coordinate with the mapping software vendor."
+                    ]
+                },
+                {
+                    title: "3. Review and test the demo environment.",
+                    description: "Interact with the configured Zoho CRM system in the demo environment, testing functionalities and providing feedback for refinement.",
+                    howTo: [
+                        "Log in to the temporary Zoho CRM demo account provided by Robert.",
+                        "<strong>Test 'Last Activity' and 'Last Inquiry Date':</strong> Perform actions (log calls, send emails, complete tasks) and observe updates. Create dummy patient leads/referrals and check 'Last Inquiry Date'.",
+                        "<strong>Test Account Scoring:</strong> Review `Account Score` for demo accounts. Create new demo accounts/leads/admits to see if scoring updates as expected.",
+                        "<strong>Test Inactive Account Automation:</strong> Observe if demo accounts with no activity for 3 months are flagged as 'Inactive' (may require setting back dates or waiting).",
+                        "<strong>Test Task Management:</strong> Create tasks. Attempt completion without mandatory fields. Verify layout. Test notes. Attempt deletion to confirm policy.",
+                        "<strong>Test User Visibility (if possible):</strong> If multiple demo users, test manager visibility.",
+                        "<strong>Provide Feedback:</strong> Document issues, unexpected behaviors, or suggestions. Be specific."
+                    ]
+                }
+            ],
+            nextSteps: [
+                 {
+                    title: "1. Robert will set up Greg's team's live Zoho instance, including intensive email integration.",
+                    description: "Goal: To prepare the production environment for eventual team use, ensuring all core configurations are in place and email communication is fully functional.",
+                    implication: "This is a critical technical phase that requires careful execution to avoid disruption and ensure seamless email operations within the CRM."
+                },
+                {
+                    title: "2. Robert will create a demo environment with sample data (admits, leads) for Greg to \"poke and play\" and provide feedback.",
+                    description: "Goal: To allow Greg, as the key stakeholder, a hands-on opportunity to validate the system's logic and usability before full deployment.",
+                    implication: "Greg's active engagement and detailed feedback during this phase are crucial for iterative refinement and ensuring the system truly meets the business's operational needs."
+                },
+                {
+                    title: "3. A meeting will be scheduled with Greg and the mapping software vendor to demo the tool and discuss territory management.",
+                    description: "Goal: To finalize the selection and configuration of the mapping solution, ensuring it effectively supports territory assignment by counties, visualizes account scores, and integrates smoothly with Zoho CRM.",
+                    implication: "This meeting is vital for optimizing BD routing and strategic planning, directly impacting field efficiency and target prioritization."
+                }
+            ]
+        };
+
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.classList.contains('bg-amber-600')) { // If it was previously active
+                       btn.classList.remove('bg-amber-600', 'text-white');
+                       btn.classList.add('bg-white', 'text-amber-600');
+                    }
+                });
+                button.classList.add('active');
+                button.classList.remove('bg-white', 'text-amber-600');
+                button.classList.add('bg-amber-600', 'text-white');
+
+
+                tabContents.forEach(content => {
+                    if (content.id === targetTab) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+        // Activate the first tab by default
+        if (tabButtons.length > 0) {
+            tabButtons[0].click();
+        }
+        
+        // Task card expand/collapse functionality
+        function createTaskCard(item) {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-4 rounded-lg shadow-md border border-stone-200';
+
+            const header = document.createElement('div');
+            header.className = 'flex justify-between items-center cursor-pointer';
+            header.innerHTML = `
+                <h4 class="text-lg font-medium text-stone-700">${item.title}</h4>
+                <span class="text-amber-600 transform transition-transform duration-200">&#x25BC;</span> `;
+
+            const content = document.createElement('div');
+            content.className = 'task-card-content mt-3 pt-3 border-t border-stone-200 text-sm text-stone-600 space-y-2';
+            
+            const descriptionP = document.createElement('p');
+            descriptionP.innerHTML = `<strong>Description:</strong> ${item.description}`;
+            content.appendChild(descriptionP);
+
+            if (item.howTo && item.howTo.length > 0) {
+                const howToTitle = document.createElement('p');
+                howToTitle.innerHTML = '<strong>How to accomplish in Zoho:</strong>';
+                content.appendChild(howToTitle);
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc list-inside ml-4 space-y-1';
+                item.howTo.forEach(step => {
+                    const li = document.createElement('li');
+                    li.innerHTML = step; // Use innerHTML to render bold tags
+                    ul.appendChild(li);
+                });
+                content.appendChild(ul);
+            }
+            
+            if (item.implication) {
+                 const implicationP = document.createElement('p');
+                 implicationP.innerHTML = `<strong>Implication:</strong> ${item.implication}`;
+                 content.appendChild(implicationP);
+            }
+
+
+            header.addEventListener('click', () => {
+                content.classList.toggle('expanded');
+                const arrow = header.querySelector('span');
+                arrow.style.transform = content.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+
+            card.appendChild(header);
+            card.appendChild(content);
+            return card;
+        }
+
+        // Populate Robert's tasks
+        const robertContactsContainer = document.getElementById('robert-contacts');
+        reportData.robertActions.contacts.forEach(item => robertContactsContainer.appendChild(createTaskCard(item)));
+        
+        const robertAccountsContainer = document.getElementById('robert-accounts');
+        reportData.robertActions.accounts.forEach(item => robertAccountsContainer.appendChild(createTaskCard(item)));
+
+        const robertTasksModuleContainer = document.getElementById('robert-tasks-module');
+        reportData.robertActions.tasksModule.forEach(item => robertTasksModuleContainer.appendChild(createTaskCard(item)));
+
+        const robertMappingContainer = document.getElementById('robert-mapping');
+        reportData.robertActions.mapping.forEach(item => robertMappingContainer.appendChild(createTaskCard(item)));
+
+        const robertPlatformContainer = document.getElementById('robert-platform');
+        reportData.robertActions.platform.forEach(item => robertPlatformContainer.appendChild(createTaskCard(item)));
+
+        // Populate Greg's tasks
+        const gregTasksContainer = document.getElementById('greg-tasks');
+        reportData.gregActions.forEach(item => gregTasksContainer.appendChild(createTaskCard(item)));
+        
+        // Populate Project Next Steps
+        const projectNextStepsContainer = document.getElementById('project-next-steps');
+        reportData.nextSteps.forEach(item => projectNextStepsContainer.appendChild(createTaskCard(item)));
+
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Chart.js Implementation
+        const taskDistributionCtx = document.getElementById('taskDistributionChart').getContext('2d');
+        const taskDistributionData = {
+            labels: ["Robert's Action Items", "Greg's Action Items", "Project Next Steps"],
+            datasets: [{
+                label: 'Number of Action Items',
+                data: [
+                    Object.values(reportData.robertActions).reduce((sum, arr) => sum + arr.length, 0),
+                    reportData.gregActions.length,
+                    reportData.nextSteps.length
+                ],
+                backgroundColor: [
+                    'rgba(217, 119, 6, 0.6)', // amber-600 with opacity
+                    'rgba(245, 158, 11, 0.6)', // amber-500 with opacity
+                    'rgba(251, 191, 36, 0.6)'  // amber-400 with opacity
+                ],
+                borderColor: [
+                    'rgba(217, 119, 6, 1)',
+                    'rgba(245, 158, 11, 1)',
+                    'rgba(251, 191, 36, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        new Chart(taskDistributionCtx, {
+            type: 'bar',
+            data: taskDistributionData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#57534E' // stone-600
+                        },
+                        grid: {
+                            color: '#E7E5E4' // stone-200
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#57534E', // stone-600
+                            maxRotation: 0,
+                            minRotation: 0,
+                            callback: function(value, index, values) {
+                                const label = this.getLabelForValue(value);
+                                if (label.length > 16) {
+                                    return label.substring(0, 16) + '...';
+                                }
+                                return label;
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false 
+                    },
+                    tooltip: {
+                        backgroundColor: '#44403C', // stone-700
+                        titleColor: '#F5F5F4', // stone-100
+                        bodyColor: '#F5F5F4', // stone-100
+                    }
+                }
+            }
+        });
+
+        const robertTasksByModuleCtx = document.getElementById('robertTasksByModuleChart').getContext('2d');
+        const robertTasksByModuleData = {
+            labels: [
+                "Contacts Module", 
+                "Accounts Module", 
+                "Tasks Module", 
+                "Mapping & Territory", 
+                "Zoho Platform Setup"
+            ],
+            datasets: [{
+                label: "Robert's Tasks",
+                data: [
+                    reportData.robertActions.contacts.length,
+                    reportData.robertActions.accounts.length,
+                    reportData.robertActions.tasksModule.length,
+                    reportData.robertActions.mapping.length,
+                    reportData.robertActions.platform.length
+                ],
+                backgroundColor: 'rgba(217, 119, 6, 0.6)', // amber-600
+                borderColor: 'rgba(217, 119, 6, 1)',
+                borderWidth: 1
+            }]
+        };
+         new Chart(robertTasksByModuleCtx, {
+            type: 'bar',
+            data: robertTasksByModuleData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                 scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#57534E' // stone-600
+                        },
+                        grid: {
+                            color: '#E7E5E4' // stone-200
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#57534E', // stone-600
+                             maxRotation: 0,
+                             minRotation: 0,
+                             callback: function(value, index, values) {
+                                const label = this.getLabelForValue(value);
+                                if (label.length > 16) {
+                                    return label.substring(0, 16) + '...';
+                                }
+                                return label;
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#44403C', // stone-700
+                        titleColor: '#F5F5F4', // stone-100
+                        bodyColor: '#F5F5F4', // stone-100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
